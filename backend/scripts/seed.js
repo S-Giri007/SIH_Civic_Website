@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
 const User = require('../models/User');
@@ -8,7 +7,7 @@ const Issue = require('../models/Issue');
 const seedData = async () => {
   try {
     // Connect to MongoDB
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/civic-portal');
+    await mongoose.connect("mongodb+srv://giri:Sgiri%40123@giridb.ruxfhu5.mongodb.net/SIH");
     console.log('Connected to MongoDB');
 
     // Clear existing data

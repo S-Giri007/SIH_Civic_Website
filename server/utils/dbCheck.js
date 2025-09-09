@@ -7,8 +7,6 @@ const checkDatabase = async () => {
     console.log('URI:', uri.replace(/\/\/.*@/, '//***:***@')); // Hide credentials in logs
     
     await mongoose.connect(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       serverSelectionTimeoutMS: 5000, // 5 second timeout
     });
     

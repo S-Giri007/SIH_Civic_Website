@@ -3,10 +3,10 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import PublicIssueForm from './components/PublicIssueForm';
 import OfficerLogin from './components/OfficerLogin';
 import OfficerDashboard from './components/OfficerDashboard';
-import UserManagement from './components/UserManagement';
 import Navigation from './components/Navigation';
 import { User, AuthState } from './types';
-import { getStoredUser, isAuthenticated, isOfficer, setUserData } from './utils/auth';
+import { getStoredUser, isAuthenticated, isOfficer } from './utils/auth';
+import { setAuthData } from './utils/auth';
 
 function App() {
   const [authState, setAuthState] = useState<AuthState>({
@@ -49,7 +49,7 @@ function App() {
   }, []);
 
   const handleLogin = (user: User) => {
-    setUserData(user);
+    setAuthData('mock-token', user);
     setAuthState({
       user,
       isAuthenticated: true,
@@ -98,11 +98,7 @@ function App() {
             onLogout={handleLogout}
           />
           <main>
-            {currentView === 'users' ? (
-              <UserManagement currentUser={authState.user} />
-            ) : (
-              <OfficerDashboard user={authState.user} />
-            )}
+            <OfficerDashboard user={authState.user} />
           </main>
         </div>
       </Router>

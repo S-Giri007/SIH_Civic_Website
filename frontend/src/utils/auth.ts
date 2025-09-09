@@ -1,9 +1,15 @@
 import { User } from '../types';
 
+const TOKEN_KEY = 'civic_auth_token';
 const USER_KEY = 'civic_user_data';
 
-export const setUserData = (user: User): void => {
+export const setAuthData = (token: string, user: User): void => {
+  localStorage.setItem(TOKEN_KEY, token);
   localStorage.setItem(USER_KEY, JSON.stringify(user));
+};
+
+export const getAuthToken = (): string | null => {
+  return localStorage.getItem(TOKEN_KEY);
 };
 
 export const getStoredUser = (): User | null => {
@@ -12,11 +18,12 @@ export const getStoredUser = (): User | null => {
 };
 
 export const clearAuthData = (): void => {
+  localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
 };
 
 export const isAuthenticated = (): boolean => {
-  return getStoredUser() !== null;
+  return getAuthToken() !== null;
 };
 
 export const isOfficer = (user: User | null): boolean => {

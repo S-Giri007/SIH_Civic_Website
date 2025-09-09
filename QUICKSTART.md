@@ -53,13 +53,18 @@ Visit: http://localhost:5173
 
 After running `npm run seed`:
 
-**Officers:**
-- Username: `officer1` Password: `password123`
-- Username: `officer2` Password: `password123`
+**Officers (Verified):**
+- `admin/admin123` - Chief Administrator
+- `officer1/password123` - Field Officer  
+- `officer2/password123` - Senior Officer
+- `supervisor/super123` - Supervisor
+
+**Officers (Unverified):**
+- `inspector/inspect123` - Inspector ⚠️
 
 **Citizens:**
-- Username: `citizen1` Password: `password123`
-- Username: `citizen2` Password: `password123`
+- `citizen1/password123` - Mike Smith
+- `citizen2/password123` - Lisa Johnson
 
 ## 🔧 Troubleshooting
 

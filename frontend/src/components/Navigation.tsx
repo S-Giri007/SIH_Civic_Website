@@ -1,5 +1,5 @@
 import React from 'react';
-import { LogOut, User, FileText, BarChart3, Users } from 'lucide-react';
+import { LogOut, User, FileText, BarChart3 } from 'lucide-react';
 import { clearAuthData, isOfficer } from '../utils/auth';
 import { User as UserType } from '../types';
 
@@ -25,30 +25,17 @@ const Navigation: React.FC<NavigationProps> = ({ user, currentView, onViewChange
             
             <div className="hidden md:flex space-x-4">
               {isOfficer(user) ? (
-                <>
-                  <button
-                    onClick={() => onViewChange('dashboard')}
-                    className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      currentView === 'dashboard'
-                        ? 'bg-blue-100 text-blue-700'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                    }`}
-                  >
-                    <BarChart3 className="w-4 h-4 mr-2" />
-                    Dashboard
-                  </button>
-                  <button
-                    onClick={() => onViewChange('users')}
-                    className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      currentView === 'users'
-                        ? 'bg-blue-100 text-blue-700'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                    }`}
-                  >
-                    <Users className="w-4 h-4 mr-2" />
-                    User Management
-                  </button>
-                </>
+                <button
+                  onClick={() => onViewChange('dashboard')}
+                  className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    currentView === 'dashboard'
+                      ? 'bg-blue-100 text-blue-700'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                  }`}
+                >
+                  <BarChart3 className="w-4 h-4 mr-2" />
+                  Dashboard
+                </button>
               ) : (
                 <button
                   onClick={() => onViewChange('submit')}

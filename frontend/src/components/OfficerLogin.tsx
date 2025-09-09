@@ -27,16 +27,16 @@ const OfficerLogin: React.FC<OfficerLoginProps> = ({ onLogin, onBackToPublic }) 
       }
 
       const { loginUser } = await import('../services/mongodb');
-      const user = await loginUser(formData.username, formData.password);
+      const { user, token } = await loginUser(formData.username, formData.password);
       
       if (user.role !== 'officer') {
         setError('Access denied. Officer credentials required.');
         return;
       }
 
-      // Store user data
-      const { setUserData } = await import('../utils/auth');
-      setUserData(user);
+      // Store auth data
+      const { setAuthData } = await import('../utils/auth');
+      setAuthData(token, user);
       
       onLogin(user);
     } catch (err: any) {
