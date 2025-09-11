@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Camera, Send, AlertTriangle, X, Upload } from 'lucide-react';
 import { Issue } from '../types';
-import SimpleLocationPicker from './SimpleLocationPicker';
+import EmbeddedMapPicker from './EmbeddedMapPicker';
 import SimpleHeader from './SimpleHeader';
 
 const PublicIssueForm: React.FC = () => {
@@ -9,7 +9,6 @@ const PublicIssueForm: React.FC = () => {
     title: '',
     description: '',
     category: 'road' as Issue['category'],
-    priority: 'medium' as Issue['priority'],
     location: '',
     citizenName: '',
     citizenContact: '',
@@ -30,11 +29,7 @@ const PublicIssueForm: React.FC = () => {
     { value: 'other', label: 'Other', icon: '📋', description: 'General civic concerns' },
   ];
 
-  const priorities = [
-    { value: 'low', label: 'Low', color: 'text-green-600', description: 'Minor issue, not urgent' },
-    { value: 'medium', label: 'Medium', color: 'text-yellow-600', description: 'Moderate concern' },
-    { value: 'high', label: 'High', color: 'text-red-600', description: 'Urgent attention needed' },
-  ];
+
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData(prev => ({
@@ -100,6 +95,7 @@ const PublicIssueForm: React.FC = () => {
 
       const issueData: Omit<Issue, '_id' | 'createdAt' | 'updatedAt'> = {
         ...formData,
+        priority: 'medium', // Default priority since user doesn't select it
         images: imageUrls,
         citizenId: '', // Will be set by backend if user is authenticated
         status: 'pending',
@@ -130,7 +126,6 @@ const PublicIssueForm: React.FC = () => {
       title: '',
       description: '',
       category: 'road',
-      priority: 'medium',
       location: '',
       citizenName: '',
       citizenContact: '',
@@ -241,7 +236,7 @@ const PublicIssueForm: React.FC = () => {
                   </div>
 
                   <div>
-                    <SimpleLocationPicker
+                    <EmbeddedMapPicker
                       onLocationSelect={handleLocationSelect}
                       initialLocation={locationData ? { lat: locationData.lat, lng: locationData.lng } : undefined}
                     />
@@ -282,36 +277,7 @@ const PublicIssueForm: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">
-                      Priority Level
-                    </label>
-                    <div className="space-y-2">
-                      {priorities.map((priority) => (
-                        <label
-                          key={priority.value}
-                          className={`flex items-center p-3 border rounded-lg cursor-pointer transition-all ${
-                            formData.priority === priority.value
-                              ? 'border-blue-500 bg-blue-50'
-                              : 'border-gray-300 hover:border-gray-400'
-                          }`}
-                        >
-                          <input
-                            type="radio"
-                            name="priority"
-                            value={priority.value}
-                            checked={formData.priority === priority.value}
-                            onChange={handleInputChange}
-                            className="sr-only"
-                          />
-                          <div className="flex-1">
-                            <span className={`font-medium ${priority.color}`}>{priority.label}</span>
-                            <p className="text-sm text-gray-600">{priority.description}</p>
-                          </div>
-                        </label>
-                      ))}
-                    </div>
-                  </div> */}
+
                 </div>
               </div>
 

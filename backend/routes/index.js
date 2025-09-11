@@ -370,6 +370,7 @@ router.post('/issues', async (req, res) => {
       category,
       priority,
       location,
+      locationCoordinates,
       images,
       citizenName,
       citizenContact
@@ -385,6 +386,19 @@ router.post('/issues', async (req, res) => {
       citizenName,
       citizenContact
     };
+
+    // Add location coordinates if provided
+    if (locationCoordinates && 
+        typeof locationCoordinates.lat === 'number' && 
+        typeof locationCoordinates.lng === 'number') {
+      issueData.locationCoordinates = {
+        lat: locationCoordinates.lat,
+        lng: locationCoordinates.lng
+      };
+      console.log('Saving issue with coordinates:', issueData.locationCoordinates);
+    } else {
+      console.log('No valid coordinates provided for issue:', title);
+    }
 
     // If user is authenticated, link the issue to them
     if (req.header('Authorization')) {

@@ -17,6 +17,10 @@ export interface Issue {
   priority: 'low' | 'medium' | 'high';
   status: 'pending' | 'in-progress' | 'resolved' | 'rejected';
   location: string;
+  locationCoordinates?: {
+    lat: number;
+    lng: number;
+  };
   images: string[];
   citizenId: string;
   citizenName: string;

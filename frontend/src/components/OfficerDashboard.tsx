@@ -13,10 +13,13 @@ import {
   User,
   Phone,
   X,
-  Save
+  Save,
+  Map
 } from 'lucide-react';
 import { Issue } from '../types';
 import { getIssues, updateIssue } from '../services/mongodb';
+import IssueLocationMap from './IssueLocationMap';
+import SingleLocationMap from './SingleLocationMap';
 
 interface OfficerDashboardProps {
   user: any;
@@ -31,12 +34,25 @@ const OfficerDashboard: React.FC<OfficerDashboardProps> = ({ user }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [showMap, setShowMap] = useState(false);
 
   useEffect(() => {
     const fetchIssues = async () => {
       try {
         const { getIssues } = await import('../services/mongodb');
         const response = await getIssues({ limit: 100 }); // Get more issues for dashboard
+        
+        // Debug: Log the raw response to see what coordinates we're getting
+        console.log('Raw issues from backend:', response.issues.map(issue => ({
+          title: issue.title,
+          location: issue.location,
+          locationCoordinates: issue.locationCoordinates
+        })));
+        
+        // Use the issues as they come from the backend (with real coordinates)
+        console.log('Issues with coordinates:', response.issues.filter(issue => issue.locationCoordinates).length);
+        console.log('Issues without coordinates:', response.issues.filter(issue => !issue.locationCoordinates).length);
+        
         setIssues(response.issues);
         setFilteredIssues(response.issues);
       } catch (error) {
@@ -238,7 +254,70 @@ const OfficerDashboard: React.FC<OfficerDashboardProps> = ({ user }) => {
           </div>
         </div>
 
+        {/* Map Section */}
+        {showMap && !selectedIssue && (
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">Issue Locations Map</h2>
+                <p className="text-sm text-gray-600">
+                  {issues.filter(i => i.locationCoordinates).length} of {issues.length} issues have location coordinates
+                </p>
+              </div>
+              <button
+                onClick={() => setShowMap(false)}
+                className="text-gray-500 hover:text-gray-700 flex items-center text-sm"
+                title="Hide Map"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            {/* Debug Info */}
+            {process.env.NODE_ENV === 'development' && (
+              <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm">
+                <strong>Debug Info:</strong> 
+                <span className="ml-2">
+                  Total Issues: {issues.length}, 
+                  With Coordinates: {issues.filter(i => i.locationCoordinates).length},
+                  Sample Coordinates Added: {issues.filter(i => i.locationCoordinates && !i.location.includes('lat')).length}
+                </span>
+              </div>
+            )}
+            
+            <div className="relative z-10">
+              <IssueLocationMap
+                key={`map-${showMap}`} // Force re-initialization when map is shown
+                issues={issues}
+                selectedIssue={selectedIssue}
+                onIssueSelect={setSelectedIssue}
+                height="500px"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Toggle Map Button */}
+        {!showMap && (
+          <div className="mb-6">
+            <button
+              onClick={() => setShowMap(true)}
+              className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium"
+            >
+              <Map className="w-4 h-4 mr-2" />
+              Show Map ({issues.filter(i => i.locationCoordinates).length} locations)
+            </button>
+          </div>
+        )}
+
         {/* Issues List */}
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold text-gray-900">Issues List</h2>
+          <div className="text-sm text-gray-600">
+            {filteredIssues.length} of {issues.length} issues
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {filteredIssues.map((issue) => (
             <div key={issue._id} className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow">
@@ -289,8 +368,30 @@ const OfficerDashboard: React.FC<OfficerDashboardProps> = ({ user }) => {
 
       {/* Issue Detail Modal */}
       {selectedIssue && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl max-w-2xl w-full max-h-screen overflow-y-auto">
+        <>
+          <style>{`
+            .leaflet-container,
+            .leaflet-control-container,
+            .leaflet-pane,
+            .leaflet-map-pane {
+              z-index: 1 !important;
+            }
+          `}</style>
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4" 
+            style={{ zIndex: 9999 }}
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setSelectedIssue(null);
+                setIsEditing(false);
+              }
+            }}
+          >
+            <div 
+              className="bg-white rounded-xl max-w-2xl w-full max-h-screen overflow-y-auto relative" 
+              style={{ zIndex: 10000 }}
+              onClick={(e) => e.stopPropagation()}
+            >
             <div className="p-6 border-b">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold text-gray-900">Issue Details</h2>
@@ -330,7 +431,14 @@ const OfficerDashboard: React.FC<OfficerDashboardProps> = ({ user }) => {
                   <div className="space-y-3 text-sm">
                     <div className="flex items-center">
                       <MapPin className="w-4 h-4 text-gray-400 mr-2" />
-                      {selectedIssue.location}
+                      <div>
+                        <div>{selectedIssue.location}</div>
+                        {selectedIssue.locationCoordinates && (
+                          <div className="text-xs text-gray-500 mt-1">
+                            Coordinates: {selectedIssue.locationCoordinates.lat.toFixed(6)}, {selectedIssue.locationCoordinates.lng.toFixed(6)}
+                          </div>
+                        )}
+                      </div>
                     </div>
                     <div className="flex items-center">
                       <User className="w-4 h-4 text-gray-400 mr-2" />
@@ -350,6 +458,21 @@ const OfficerDashboard: React.FC<OfficerDashboardProps> = ({ user }) => {
                 <div>
                   <h4 className="font-medium mb-2">Description</h4>
                   <p className="text-gray-600 text-sm mb-4">{selectedIssue.description}</p>
+
+                  {/* Location Map */}
+                  {selectedIssue.locationCoordinates && (
+                    <div className="mb-4">
+                      <h4 className="font-medium mb-2">Location Map</h4>
+                      <SingleLocationMap
+                        latitude={selectedIssue.locationCoordinates.lat}
+                        longitude={selectedIssue.locationCoordinates.lng}
+                        address={selectedIssue.location}
+                        title={selectedIssue.title}
+                        height="200px"
+                        showControls={true}
+                      />
+                    </div>
+                  )}
 
                   {selectedIssue.images && selectedIssue.images.length > 0 && (
                     <div>
@@ -402,7 +525,8 @@ const OfficerDashboard: React.FC<OfficerDashboardProps> = ({ user }) => {
               )}
             </div>
           </div>
-        </div>
+    </div>
+        </>
       )}
     </div>
   );
