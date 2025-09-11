@@ -1,0 +1,136 @@
+{
+  "info": {
+    "name": "CivicPortal API Tests",
+    "description": "Test collection for CivicPortal API deployed on Render",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://your-app-name.onrender.com",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        }
+      }
+    },
+    {
+      "name": "Create Issue",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Test Pothole\",\n  \"description\": \"Large pothole on Main Street causing traffic issues\",\n  \"category\": \"road\",\n  \"location\": \"Main Street, Downtown\",\n  \"locationCoordinates\": {\n    \"lat\": 40.7128,\n    \"lng\": -74.0060\n  },\n  \"citizenName\": \"John Doe\",\n  \"citizenContact\": \"john.doe@email.com\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/issues",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "issues"]
+        }
+      }
+    },
+    {
+      "name": "Get All Issues",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/issues",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "issues"]
+        }
+      }
+    },
+    {
+      "name": "Register User",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"testpass123\",\n  \"name\": \"Test User\",\n  \"email\": \"test@example.com\",\n  \"role\": \"citizen\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/register",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "register"]
+        }
+      }
+    },
+    {
+      "name": "Login User",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"testpass123\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/simple-login",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "simple-login"]
+        }
+      }
+    },
+    {
+      "name": "Register Officer",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"officer1\",\n  \"password\": \"officer123\",\n  \"name\": \"Officer Smith\",\n  \"email\": \"officer@city.gov\",\n  \"role\": \"officer\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/register",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "register"]
+        }
+      }
+    },
+    {
+      "name": "Get Issue Stats",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/issues/stats/overview",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "issues", "stats", "overview"]
+        }
+      }
+    }
+  ]
+}

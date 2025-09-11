@@ -2,7 +2,7 @@ import axios from 'axios';
 import { User, Issue } from '../types';
 import { getAuthToken } from '../utils/auth';
 
-const API_BASE_URL = 'http://localhost:3001/api';
+const API_BASE_URL = 'https://sih-civic-website.onrender.com/api';
 
 // Create axios instance with interceptors
 const api = axios.create({
