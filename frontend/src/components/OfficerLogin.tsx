@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { LogIn, Shield, Lock, User, ArrowLeft } from 'lucide-react';
 import { User as UserType } from '../types';
 
 interface OfficerLoginProps {
   onLogin: (user: UserType) => void;
-  onBackToPublic: () => void;
 }
 
-const OfficerLogin: React.FC<OfficerLoginProps> = ({ onLogin, onBackToPublic }) => {
+const OfficerLogin: React.FC<OfficerLoginProps> = ({ onLogin }) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -39,6 +40,7 @@ const OfficerLogin: React.FC<OfficerLoginProps> = ({ onLogin, onBackToPublic }) 
       setAuthData(token, user);
       
       onLogin(user);
+      navigate('/dashboard');
     } catch (err: any) {
       console.error('Login error:', err);
       setError(err.message || 'Authentication failed. Please try again.');
@@ -55,7 +57,7 @@ const OfficerLogin: React.FC<OfficerLoginProps> = ({ onLogin, onBackToPublic }) 
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4 page-transition">
       <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
           <div className="bg-blue-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -130,13 +132,13 @@ const OfficerLogin: React.FC<OfficerLoginProps> = ({ onLogin, onBackToPublic }) 
         </form>
 
         <div className="mt-6 pt-6 border-t">
-          <button
-            onClick={onBackToPublic}
+          <Link
+            to="/"
             className="w-full flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Public Portal
-          </button>
+          </Link>
         </div>
 
         <div className="mt-4 p-4 bg-gray-50 rounded-lg">

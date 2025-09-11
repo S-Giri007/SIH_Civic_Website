@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Civic Portal - Basic Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        .test-item {
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+        .success { background: rgba(34, 197, 94, 0.3); }
+        .error { background: rgba(239, 68, 68, 0.3); }
+        .warning { background: rgba(245, 158, 11, 0.3); }
+        button {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #4338ca; }
+        .code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Civic Portal - Basic Functionality Test</h1>
+        <p>This page tests if your browser and basic setup are working correctly.</p>
+        
+        <div id="tests">
+            <div class="test-item" id="browser-test">
+                <h3>🌐 Browser Compatibility</h3>
+                <p>Testing JavaScript and modern browser features...</p>
+            </div>
+            
+            <div class="test-item" id="fetch-test">
+                <h3>🔗 Network Connectivity</h3>
+                <p>Testing if browser can make network requests...</p>
+            </div>
+            
+            <div class="test-item" id="backend-test">
+                <h3>🖥️ Backend Connection</h3>
+                <p>Testing connection to backend server...</p>
+                <button onclick="testBackend()">Test Backend (Port 3001)</button>
+            </div>
+            
+            <div class="test-item" id="frontend-test">
+                <h3>⚛️ Frontend Server</h3>
+                <p>Testing if frontend development server is accessible...</p>
+                <button onclick="testFrontend()">Test Frontend (Port 5173)</button>
+            </div>
+        </div>
+        
+        <div class="test-item">
+            <h3>📋 Manual Checklist</h3>
+            <p>Please verify these steps manually:</p>
+            <ul>
+                <li>✅ Node.js installed (v16 or higher)</li>
+                <li>✅ Dependencies installed (npm install in both frontend and backend folders)</li>
+                <li>✅ Backend server running (npm start in backend folder)</li>
+                <li>✅ Frontend server running (npm run dev in frontend folder)</li>
+                <li>✅ No firewall blocking ports 3001 and 5173</li>
+            </ul>
+        </div>
+        
+        <div class="test-item">
+            <h3>🚀 Quick Start Commands</h3>
+            <div class="code">
+                # Terminal 1 - Start Backend<br>
+                cd backend<br>
+                npm install<br>
+                npm start<br><br>
+                
+                # Terminal 2 - Start Frontend<br>
+                cd frontend<br>
+                npm install<br>
+                npm run dev
+            </div>
+        </div>
+        
+        <div class="test-item">
+            <h3>🔍 Troubleshooting</h3>
+            <button onclick="showSystemInfo()">Show System Info</button>
+            <button onclick="testLocalStorage()">Test Local Storage</button>
+            <button onclick="testConsole()">Test Console</button>
+            <div id="system-info" style="margin-top: 10px;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Test 1: Browser Compatibility
+        function testBrowser() {
+            const browserTest = document.getElementById('browser-test');
+            try {
+                // Test modern JavaScript features
+                const testArrow = () => 'arrow functions work';
+                const testTemplate = `template literals work`;
+                const testAsync = async () => 'async/await works';
+                
+                // Test if fetch is available
+                if (typeof fetch !== 'undefined') {
+                    browserTest.className = 'test-item success';
+                    browserTest.innerHTML += '<p>✅ Browser supports modern JavaScript and fetch API</p>';
+                } else {
+                    browserTest.className = 'test-item error';
+                    browserTest.innerHTML += '<p>❌ Browser does not support fetch API</p>';
+                }
+            } catch (error) {
+                browserTest.className = 'test-item error';
+                browserTest.innerHTML += `<p>❌ Browser compatibility issue: ${error.message}</p>`;
+            }
+        }
+        
+        // Test 2: Network Connectivity
+        function testNetwork() {
+            const networkTest = document.getElementById('fetch-test');
+            
+            // Test basic network connectivity
+            fetch('https://httpbin.org/get')
+                .then(response => response.json())
+                .then(data => {
+                    networkTest.className = 'test-item success';
+                    networkTest.innerHTML += '<p>✅ Network connectivity working</p>';
+                })
+                .catch(error => {
+                    networkTest.className = 'test-item warning';
+                    networkTest.innerHTML += '<p>⚠️ Network connectivity limited (this is normal for local development)</p>';
+                });
+        }
+        
+        // Test 3: Backend Connection
+        function testBackend() {
+            const backendTest = document.getElementById('backend-test');
+            backendTest.innerHTML = '<h3>🖥️ Backend Connection</h3><p>Testing backend server...</p>';
+            
+            fetch('http://localhost:3001/health')
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error(`HTTP ${response.status}`);
+                })
+                .then(data => {
+                    backendTest.className = 'test-item success';
+                    backendTest.innerHTML += '<p>✅ Backend server is running and responding</p>';
+                    backendTest.innerHTML += `<p>Server status: ${data.status}</p>`;
+                })
+                .catch(error => {
+                    backendTest.className = 'test-item error';
+                    backendTest.innerHTML += '<p>❌ Backend server not accessible</p>';
+                    backendTest.innerHTML += `<p>Error: ${error.message}</p>`;
+                    backendTest.innerHTML += '<p>💡 Make sure to run: cd backend && npm start</p>';
+                });
+        }
+        
+        // Test 4: Frontend Server
+        function testFrontend() {
+            const frontendTest = document.getElementById('frontend-test');
+            frontendTest.innerHTML = '<h3>⚛️ Frontend Server</h3><p>Testing frontend server...</p>';
+            
+            fetch('http://localhost:5173/')
+                .then(response => {
+                    if (response.ok) {
+                        frontendTest.className = 'test-item success';
+                        frontendTest.innerHTML += '<p>✅ Frontend server is running</p>';
+                        frontendTest.innerHTML += '<p><a href="http://localhost:5173/" target="_blank" style="color: #60a5fa;">Open Civic Portal →</a></p>';
+                    } else {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                })
+                .catch(error => {
+                    frontendTest.className = 'test-item error';
+                    frontendTest.innerHTML += '<p>❌ Frontend server not accessible</p>';
+                    frontendTest.innerHTML += `<p>Error: ${error.message}</p>`;
+                    frontendTest.innerHTML += '<p>💡 Make sure to run: cd frontend && npm run dev</p>';
+                });
+        }
+        
+        // Show system information
+        function showSystemInfo() {
+            const systemInfo = document.getElementById('system-info');
+            const info = {
+                'User Agent': navigator.userAgent,
+                'Platform': navigator.platform,
+                'Language': navigator.language,
+                'Online': navigator.onLine,
+                'Cookies Enabled': navigator.cookieEnabled,
+                'Local Storage': typeof(Storage) !== "undefined",
+                'Current URL': window.location.href,
+                'Screen Resolution': `${screen.width}x${screen.height}`,
+                'Viewport Size': `${window.innerWidth}x${window.innerHeight}`
+            };
+            
+            let html = '<h4>System Information:</h4><div class="code">';
+            for (const [key, value] of Object.entries(info)) {
+                html += `${key}: ${value}<br>`;
+            }
+            html += '</div>';
+            systemInfo.innerHTML = html;
+        }
+        
+        // Test local storage
+        function testLocalStorage() {
+            try {
+                localStorage.setItem('test', 'value');
+                const value = localStorage.getItem('test');
+                localStorage.removeItem('test');
+                
+                if (value === 'value') {
+                    alert('✅ Local Storage is working correctly');
+                } else {
+                    alert('❌ Local Storage test failed');
+                }
+            } catch (error) {
+                alert(`❌ Local Storage error: ${error.message}`);
+            }
+        }
+        
+        // Test console
+        function testConsole() {
+            console.log('🧪 Console test from Civic Portal diagnostic page');
+            console.log('✅ If you can see this message, console logging is working');
+            alert('Check the browser console (F12) for test messages');
+        }
+        
+        // Run tests on page load
+        window.addEventListener('load', () => {
+            testBrowser();
+            testNetwork();
+        });
+    </script>
+</body>
+</html>

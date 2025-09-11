@@ -35,6 +35,18 @@ const issueSchema = new mongoose.Schema({
     trim: true,
     maxlength: 300
   },
+  locationCoordinates: {
+    lat: {
+      type: Number,
+      min: -90,
+      max: 90
+    },
+    lng: {
+      type: Number,
+      min: -180,
+      max: 180
+    }
+  },
   images: [{
     type: String,
     trim: true

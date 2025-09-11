@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
-import { Camera, MapPin, Send, AlertTriangle, X, Upload, Shield } from 'lucide-react';
+import { useState } from 'react';
+import { Camera, Send, AlertTriangle, X, Upload } from 'lucide-react';
 import { Issue } from '../types';
+import SimpleLocationPicker from './SimpleLocationPicker';
+import SimpleHeader from './SimpleHeader';
 
 const PublicIssueForm: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -12,6 +14,7 @@ const PublicIssueForm: React.FC = () => {
     citizenName: '',
     citizenContact: '',
   });
+  const [locationData, setLocationData] = useState<{ lat: number; lng: number; address: string } | null>(null);
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [imagePreview, setImagePreview] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -37,6 +40,18 @@ const PublicIssueForm: React.FC = () => {
     setFormData(prev => ({
       ...prev,
       [e.target.name]: e.target.value
+    }));
+  };
+
+  const handleLocationSelect = (location: { 
+    lat: number; 
+    lng: number; 
+    address: string;
+  }) => {
+    setLocationData(location);
+    setFormData(prev => ({
+      ...prev,
+      location: location.address
     }));
   };
 
@@ -88,6 +103,13 @@ const PublicIssueForm: React.FC = () => {
         images: imageUrls,
         citizenId: '', // Will be set by backend if user is authenticated
         status: 'pending',
+        // Add location coordinates if available
+        ...(locationData && {
+          locationCoordinates: {
+            lat: locationData.lat,
+            lng: locationData.lng
+          }
+        })
       };
 
       const { createIssue } = await import('../services/mongodb');
@@ -115,13 +137,14 @@ const PublicIssueForm: React.FC = () => {
     });
     setSelectedImages([]);
     setImagePreview([]);
+    setLocationData(null);
     setSuccess(false);
     setError('');
   };
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center p-4 fade-in">
         <div className="bg-white rounded-2xl shadow-xl p-8 text-center max-w-md w-full">
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <Send className="w-10 h-10 text-green-600" />
@@ -150,29 +173,8 @@ const PublicIssueForm: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-4xl mx-auto px-4 py-6">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Civic Complaint Portal</h1>
-            <p className="text-gray-600">Report issues in your community and help us make it better</p>
-          </div>
-          <div className="flex justify-center mt-4">
-            <button
-              onClick={() => {
-                // This will be handled by the parent App component
-                const event = new CustomEvent('showOfficerLogin');
-                window.dispatchEvent(event);
-              }}
-              className="flex items-center text-sm text-blue-600 hover:text-blue-700 font-medium"
-            >
-              <Shield className="w-4 h-4 mr-1" />
-              Officer Login
-            </button>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 page-transition">
+      <SimpleHeader />
 
       <div className="py-8 px-4">
         <div className="max-w-4xl mx-auto">
@@ -239,21 +241,10 @@ const PublicIssueForm: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Location *
-                    </label>
-                    <div className="relative">
-                      <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                      <input
-                        type="text"
-                        name="location"
-                        value={formData.location}
-                        onChange={handleInputChange}
-                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Specific address or landmark"
-                        required
-                      />
-                    </div>
+                    <SimpleLocationPicker
+                      onLocationSelect={handleLocationSelect}
+                      initialLocation={locationData ? { lat: locationData.lat, lng: locationData.lng } : undefined}
+                    />
                   </div>
                 </div>
 
@@ -291,7 +282,7 @@ const PublicIssueForm: React.FC = () => {
                     </div>
                   </div>
 
-                  <div>
+                  {/* <div>
                     <label className="block text-sm font-medium text-gray-700 mb-3">
                       Priority Level
                     </label>
@@ -320,7 +311,7 @@ const PublicIssueForm: React.FC = () => {
                         </label>
                       ))}
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
 
@@ -392,7 +383,7 @@ const PublicIssueForm: React.FC = () => {
                 >
                   {loading ? (
                     <>
-                      <Upload className="w-5 h-5 mr-2 animate-spin" />
+                      <Upload className="w-5 h-5 mr-2 animate-fade" />
                       Submitting Complaint...
                     </>
                   ) : (

@@ -1,53 +1,69 @@
-import React from 'react';
-import { LogOut, User, FileText, BarChart3 } from 'lucide-react';
+import { LogOut, User, FileText, BarChart3, Home } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 import { clearAuthData, isOfficer } from '../utils/auth';
 import { User as UserType } from '../types';
 
 interface NavigationProps {
   user: UserType;
-  currentView: string;
-  onViewChange: (view: string) => void;
   onLogout: () => void;
 }
 
-const Navigation: React.FC<NavigationProps> = ({ user, currentView, onViewChange, onLogout }) => {
+const Navigation: React.FC<NavigationProps> = ({ user, onLogout }) => {
+  const location = useLocation();
+  
   const handleLogout = () => {
     clearAuthData();
     onLogout();
   };
+
+  const isActive = (path: string) => location.pathname === path;
 
   return (
     <nav className="bg-white shadow-sm border-b">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-8">
-            <h1 className="text-xl font-bold text-blue-600">CivicPortal</h1>
+            <Link to="/" className="text-xl font-bold text-blue-600 hover:text-blue-700">
+              CivicPortal
+            </Link>
             
             <div className="hidden md:flex space-x-4">
-              {isOfficer(user) ? (
-                <button
-                  onClick={() => onViewChange('dashboard')}
+              <Link
+                to="/"
+                className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  isActive('/')
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                }`}
+              >
+                <Home className="w-4 h-4 mr-2" />
+                Home
+              </Link>
+
+              <Link
+                to="/report"
+                className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  isActive('/report')
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                }`}
+              >
+                <FileText className="w-4 h-4 mr-2" />
+                Report Issue
+              </Link>
+
+              {isOfficer(user) && (
+                <Link
+                  to="/dashboard"
                   className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    currentView === 'dashboard'
+                    isActive('/dashboard')
                       ? 'bg-blue-100 text-blue-700'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                   }`}
                 >
                   <BarChart3 className="w-4 h-4 mr-2" />
                   Dashboard
-                </button>
-              ) : (
-                <button
-                  onClick={() => onViewChange('submit')}
-                  className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    currentView === 'submit'
-                      ? 'bg-blue-100 text-blue-700'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                  }`}
-                >
-                  <FileText className="w-4 h-4 mr-2" />
-                  Report Issue
-                </button>
+                </Link>
               )}
             </div>
           </div>
