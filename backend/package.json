@@ -26,6 +26,10 @@
   "devDependencies": {
     "nodemon": "^3.0.2"
   },
+  "scripts": {
+  
+},
+
   "keywords": ["civic", "complaints", "municipal", "api"],
   "author": "Your Name",
   "license": "MIT"

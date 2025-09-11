@@ -40,7 +40,7 @@ const OfficerDashboard: React.FC<OfficerDashboardProps> = ({ user }) => {
     const fetchIssues = async () => {
       try {
         const { getIssues } = await import('../services/mongodb');
-        const response = await getIssues({ limit: 100 }); // Get more issues for dashboard
+        const response = await getIssues({ limit: 10000 }); // Get more issues for dashboard
         
         // Debug: Log the raw response to see what coordinates we're getting
         console.log('Raw issues from backend:', response.issues.map(issue => ({
