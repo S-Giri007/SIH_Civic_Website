@@ -372,6 +372,7 @@ router.post('/issues', async (req, res) => {
       location,
       locationCoordinates,
       images,
+      audioRecording,
       citizenName,
       citizenContact
     } = req.body;
@@ -383,6 +384,7 @@ router.post('/issues', async (req, res) => {
       priority: priority || 'medium',
       location,
       images: images || [],
+      audioRecording: audioRecording || null,
       citizenName,
       citizenContact
     };

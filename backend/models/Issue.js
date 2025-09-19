@@ -51,6 +51,10 @@ const issueSchema = new mongoose.Schema({
     type: String,
     trim: true
   }],
+  audioRecording: {
+    type: String,
+    trim: true
+  },
   citizenId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

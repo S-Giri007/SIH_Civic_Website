@@ -22,6 +22,7 @@ export interface Issue {
     lng: number;
   };
   images: string[];
+  audioRecording?: string; // File path for audio recording
   citizenId: string;
   citizenName: string;
   citizenContact: string;

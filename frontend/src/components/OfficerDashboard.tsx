@@ -14,12 +14,14 @@ import {
   Phone,
   X,
   Save,
-  Map
+  Map,
+  Volume2
 } from 'lucide-react';
 import { Issue } from '../types';
 import { getIssues, updateIssue } from '../services/mongodb';
 import IssueLocationMap from './IssueLocationMap';
 import SingleLocationMap from './SingleLocationMap';
+import SimpleAudioPlayer from './SimpleAudioPlayer';
 
 interface OfficerDashboardProps {
   user: any;
@@ -344,9 +346,17 @@ const OfficerDashboard: React.FC<OfficerDashboardProps> = ({ user }) => {
               <p className="text-gray-600 mb-4 line-clamp-2">{issue.description}</p>
 
               <div className="flex items-center justify-between text-sm text-gray-500">
-                <div className="flex items-center">
-                  <MapPin className="w-4 h-4 mr-1" />
-                  {issue.location}
+                <div className="flex items-center space-x-3">
+                  <div className="flex items-center">
+                    <MapPin className="w-4 h-4 mr-1" />
+                    {issue.location}
+                  </div>
+                  {issue.audioRecording && (
+                    <div className="flex items-center text-blue-600">
+                      <Volume2 className="w-4 h-4 mr-1" />
+                      Audio
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center">
                   <Calendar className="w-4 h-4 mr-1" />
@@ -471,6 +481,24 @@ const OfficerDashboard: React.FC<OfficerDashboardProps> = ({ user }) => {
                         height="200px"
                         showControls={true}
                       />
+                    </div>
+                  )}
+
+                  {/* Audio Recording */}
+                  {selectedIssue.audioRecording && (
+                    <div className="mb-4">
+                      <SimpleAudioPlayer 
+                        audioFileName={selectedIssue.audioRecording}
+                      />
+                    </div>
+                  )}
+                  
+                  {/* Debug: Show audio field status */}
+                  {process.env.NODE_ENV === 'development' && (
+                    <div className="mb-2 p-2 bg-gray-100 rounded text-xs">
+                      <strong>Debug Info:</strong><br/>
+                      Audio field: {selectedIssue.audioRecording ? `"${selectedIssue.audioRecording}"` : 'null/undefined'}<br/>
+                      LocalStorage keys: {Object.keys(localStorage).filter(k => k.startsWith('audio_')).length} audio files
                     </div>
                   )}
 

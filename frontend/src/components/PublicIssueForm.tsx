@@ -3,6 +3,8 @@ import { Camera, Send, AlertTriangle, X, Upload } from 'lucide-react';
 import { Issue } from '../types';
 import EmbeddedMapPicker from './EmbeddedMapPicker';
 import SimpleHeader from './SimpleHeader';
+import AudioRecorder from './AudioRecorder';
+import { saveAudioLocally, formatAudioFileSize, validateAudioFile } from '../services/audioUpload';
 
 const PublicIssueForm: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -16,6 +18,9 @@ const PublicIssueForm: React.FC = () => {
   const [locationData, setLocationData] = useState<{ lat: number; lng: number; address: string } | null>(null);
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [imagePreview, setImagePreview] = useState<string[]>([]);
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [audioFileName, setAudioFileName] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
@@ -74,6 +79,36 @@ const PublicIssueForm: React.FC = () => {
     setImagePreview(prev => prev.filter((_, i) => i !== index));
   };
 
+  const handleAudioRecorded = async (blob: Blob, url: string) => {
+    const validation = validateAudioFile(blob);
+    if (!validation.valid) {
+      setError(validation.error || 'Invalid audio file');
+      return;
+    }
+
+    try {
+      const fileName = `audio_${Date.now()}.webm`;
+      await saveAudioLocally(blob, fileName);
+      
+      setAudioBlob(blob);
+      setAudioUrl(url);
+      setAudioFileName(fileName);
+      setError('');
+    } catch (error) {
+      console.error('Error saving audio:', error);
+      setError('Failed to save audio recording');
+    }
+  };
+
+  const handleAudioRemoved = () => {
+    if (audioUrl) {
+      URL.revokeObjectURL(audioUrl);
+    }
+    setAudioBlob(null);
+    setAudioUrl(null);
+    setAudioFileName(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -99,6 +134,8 @@ const PublicIssueForm: React.FC = () => {
         images: imageUrls,
         citizenId: '', // Will be set by backend if user is authenticated
         status: 'pending',
+        // Add audio recording if available
+        ...(audioFileName && { audioRecording: audioFileName }),
         // Add location coordinates if available
         ...(locationData && {
           locationCoordinates: {
@@ -132,6 +169,7 @@ const PublicIssueForm: React.FC = () => {
     });
     setSelectedImages([]);
     setImagePreview([]);
+    handleAudioRemoved(); // Clean up audio
     setLocationData(null);
     setSuccess(false);
     setError('');
@@ -296,6 +334,26 @@ const PublicIssueForm: React.FC = () => {
                     placeholder="Provide detailed information about the issue, including when it started, how it affects you, and any other relevant details..."
                     required
                   />
+                  
+                  {/* Audio Recording Section */}
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Audio Description (Optional)
+                    </label>
+                    <div className="border border-gray-300 rounded-lg p-4 bg-gray-50">
+                      <AudioRecorder
+                        onAudioRecorded={handleAudioRecorded}
+                        onAudioRemoved={handleAudioRemoved}
+                        existingAudioUrl={audioUrl || undefined}
+                        disabled={loading}
+                      />
+                      {audioBlob && (
+                        <div className="mt-2 text-xs text-gray-600">
+                          Audio size: {formatAudioFileSize(audioBlob.size)}
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
 
                 <div>
